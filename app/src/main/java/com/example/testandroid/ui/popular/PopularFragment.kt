@@ -16,6 +16,7 @@ import com.example.testandroid.data.entities.MovieEntity
 import com.example.testandroid.data.model.Movie
 import com.example.testandroid.data.model.ResourceStatus
 import com.example.testandroid.databinding.FragmentPopularBinding
+import com.example.testandroid.utils.Pages
 import com.example.testandroid.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -36,8 +37,7 @@ class PopularFragment : Fragment(), PopularMovieItemAdapter.OnMovieClickListener
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-
+    ): View? {
         _binding = FragmentPopularBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -47,7 +47,24 @@ class PopularFragment : Fragment(), PopularMovieItemAdapter.OnMovieClickListener
         super.onViewCreated(view, savedInstanceState)
 
         binding.rvMovies.layoutManager = LinearLayoutManager(context)
+        Pages.popularPage+=1
+        pagination()
+        Log.i("ola","${Pages.popularPage}")
 
+
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    override fun onMovieClick(movieEntity: MovieEntity) {
+        val action = PopularFragmentDirections.actionHomeFragmentToDetailFragment(movieEntity)
+        findNavController().navigate(action)
+    }
+
+    private fun pagination() {
         viewModel.fetchPopularMovies.observe(viewLifecycleOwner, Observer {
             when (it.resourceStatus) {
                 ResourceStatus.LOADING -> {
@@ -65,15 +82,5 @@ class PopularFragment : Fragment(), PopularMovieItemAdapter.OnMovieClickListener
                 }
             }
         })
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    override fun onMovieClick(movieEntity: MovieEntity) {
-        val action = PopularFragmentDirections.actionHomeFragmentToDetailFragment(movieEntity)
-        findNavController().navigate(action)
     }
 }

@@ -16,13 +16,13 @@ import com.example.testandroid.data.entities.MovieEntity
 import com.example.testandroid.data.model.Movie
 import com.example.testandroid.data.model.ResourceStatus
 import com.example.testandroid.databinding.FragmentUpcomingBinding
-import com.example.testandroid.ui.popular.PopularMovieItemAdapter
 import com.example.testandroid.ui.upcoming.UpcomingViewModel
+import com.example.testandroid.utils.Pages
 import com.example.testandroid.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class UpcomingFragment : Fragment(), PopularMovieItemAdapter.OnMovieClickListener {
+class UpcomingFragment : Fragment(), UpcomingMovieItemAdapter.OnMovieClickListener {
 
     private var _binding: FragmentUpcomingBinding? = null
 
@@ -32,7 +32,7 @@ class UpcomingFragment : Fragment(), PopularMovieItemAdapter.OnMovieClickListene
         defaultViewModelProviderFactory
     }
 
-    private lateinit var upcomingMovieItemAdapter: PopularMovieItemAdapter
+    private lateinit var upcomingMovieItemAdapter: UpcomingMovieItemAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,8 +46,9 @@ class UpcomingFragment : Fragment(), PopularMovieItemAdapter.OnMovieClickListene
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.rvMovies.layoutManager = LinearLayoutManager(context)
+        binding.upMovies.layoutManager = LinearLayoutManager(context)
 
+        Pages.upcomingPage+=1
         viewModel.fetchUpcomingMovies.observe(viewLifecycleOwner, Observer {
             when (it.resourceStatus) {
                 ResourceStatus.LOADING -> {
@@ -55,8 +56,8 @@ class UpcomingFragment : Fragment(), PopularMovieItemAdapter.OnMovieClickListene
                 }
                 ResourceStatus.SUCCESS  -> {
                     Log.e("fetchUpcomingMovies", "Success")
-                    upcomingMovieItemAdapter = PopularMovieItemAdapter(it.data!!, this@UpcomingFragment)
-                    binding.rvMovies.adapter = upcomingMovieItemAdapter
+                    upcomingMovieItemAdapter = UpcomingMovieItemAdapter(it.data!!,this@UpcomingFragment)
+                    binding.upMovies.adapter =upcomingMovieItemAdapter
                 }
                 ResourceStatus.ERROR -> {
                     Log.e("fetchUpcomingMovies", "Failure: ${it.message} ")
@@ -64,7 +65,7 @@ class UpcomingFragment : Fragment(), PopularMovieItemAdapter.OnMovieClickListene
                         .show()
                 }
             }
-        })
+            })
     }
 
     override fun onDestroyView() {

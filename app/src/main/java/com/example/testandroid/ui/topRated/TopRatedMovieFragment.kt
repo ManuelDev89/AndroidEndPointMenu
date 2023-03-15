@@ -1,62 +1,60 @@
-package com.example.testandroid.ui.top_rated
+package com.example.testandroid.ui.topRated
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.testandroid.R
 import com.example.testandroid.data.entities.MovieEntity
-import com.example.testandroid.data.model.Movie
 import com.example.testandroid.data.model.ResourceStatus
-import com.example.testandroid.databinding.FragmentTopRatedBinding
-import com.example.testandroid.ui.popular.PopularMovieItemAdapter
-import com.example.testandroid.utils.Resource
+import com.example.testandroid.databinding.FragmentTopRatedMovieBinding
+import com.example.testandroid.utils.Pages
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class TopRatedFragment : Fragment(), PopularMovieItemAdapter.OnMovieClickListener {
+class TopRatedMovieFragment : Fragment(), TopRatedMovieItemAdapter.OnMovieClickListener {
 
-    private var _binding: FragmentTopRatedBinding? = null
+    private var _binding: FragmentTopRatedMovieBinding? = null
 
     private val binding get() = _binding!!
 
-    private val viewModel: TopRatedViewModel by navGraphViewModels(R.id.nav_graph) {
+    private val mViewModel: TopRatedMovieViewModel by navGraphViewModels(R.id.nav_graph) {
         defaultViewModelProviderFactory
     }
 
-    private lateinit var topRatedMovieItemAdapter: PopularMovieItemAdapter
+    private lateinit var topRatedMovieItemAdapter: TopRatedMovieItemAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-
-        _binding = FragmentTopRatedBinding.inflate(inflater, container, false)
+    ): View? {
+        _binding = FragmentTopRatedMovieBinding.inflate(inflater, container, false)
         return binding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.rvMovies.layoutManager = LinearLayoutManager(context)
+        binding.tpMovies.layoutManager = LinearLayoutManager(context)
 
-        viewModel.fetchTopRatedMovies.observe(viewLifecycleOwner, Observer {
+        Pages.topRatedPage+=1
+        mViewModel.fetchTopRatedMovies.observe(viewLifecycleOwner, Observer {
             when (it.resourceStatus) {
                 ResourceStatus.LOADING -> {
                     Log.e("fetchTopRatedMovies", "Loading")
                 }
                 ResourceStatus.SUCCESS  -> {
                     Log.e("fetchTopRatedMovies", "Success")
-                    topRatedMovieItemAdapter = PopularMovieItemAdapter(it.data!!, this@TopRatedFragment)
-                    binding.rvMovies.adapter = topRatedMovieItemAdapter
+                    topRatedMovieItemAdapter = TopRatedMovieItemAdapter(it.data!!, this@TopRatedMovieFragment)
+                    binding.tpMovies.adapter = topRatedMovieItemAdapter
                 }
                 ResourceStatus.ERROR -> {
                     Log.e("fetchTopRatedMovies", "Failure: ${it.message} ")
@@ -65,6 +63,7 @@ class TopRatedFragment : Fragment(), PopularMovieItemAdapter.OnMovieClickListene
                 }
             }
         })
+
     }
 
     override fun onDestroyView() {
@@ -73,7 +72,9 @@ class TopRatedFragment : Fragment(), PopularMovieItemAdapter.OnMovieClickListene
     }
 
     override fun onMovieClick(movieEntity: MovieEntity) {
-        val action = TopRatedFragmentDirections.actionTopRatedFragmentToDetailFragment(movieEntity)
+        val action = TopRatedMovieFragmentDirections.actionTopRatedMovieFragmentToDetailFragment(movieEntity)
         findNavController().navigate(action)
     }
+
+
 }
