@@ -4,6 +4,7 @@ object Pages {
     var popularPage: Int = 0
     var topRatedPage: Int = 0
     var upcomingPage: Int = 0
+    var pageMaxSize = 20
 
     fun scrollPopular() {
         Pages.popularPage +=1

@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.testandroid.R
 import com.example.testandroid.data.entities.MovieEntity
 import com.example.testandroid.data.model.Movie
@@ -38,8 +39,21 @@ class UpcomingFragment : Fragment(), UpcomingMovieItemAdapter.OnMovieClickListen
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentUpcomingBinding.inflate(inflater, container, false)
+        binding.upMovies.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val visibleIteamCount: Int = (binding.upMovies.layoutManager as LinearLayoutManager).childCount
+                val pastVisibleIteam: Int = (binding.upMovies.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                val total = binding.upMovies.adapter!!.itemCount
+                if ((visibleIteamCount + pastVisibleIteam) >= total){
+                    Log.i("progresiosds","${visibleIteamCount}, ${pastVisibleIteam}, as ${total}")
+                    Pages.upcomingPage+=1
+                    upPagination()
+                    Log.i("progress","${Pages.upcomingPage}")
+                }
+            }
+        })
         return binding.root
     }
 
@@ -49,6 +63,10 @@ class UpcomingFragment : Fragment(), UpcomingMovieItemAdapter.OnMovieClickListen
         binding.upMovies.layoutManager = LinearLayoutManager(context)
 
         Pages.upcomingPage+=1
+        upPagination()
+    }
+
+    private fun upPagination() {
         viewModel.fetchUpcomingMovies.observe(viewLifecycleOwner, Observer {
             when (it.resourceStatus) {
                 ResourceStatus.LOADING -> {
@@ -65,7 +83,7 @@ class UpcomingFragment : Fragment(), UpcomingMovieItemAdapter.OnMovieClickListen
                         .show()
                 }
             }
-            })
+        })
     }
 
     override fun onDestroyView() {

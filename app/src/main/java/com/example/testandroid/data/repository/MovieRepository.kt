@@ -1,5 +1,6 @@
 package com.example.testandroid.data.repository
 
+import android.util.Log
 import com.example.testandroid.data.local.MovieDao
 import com.example.testandroid.data.model.MovieType
 import com.example.testandroid.data.model.toMovieEntityList

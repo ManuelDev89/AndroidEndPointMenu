@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.testandroid.R
 import com.example.testandroid.data.entities.MovieEntity
 import com.example.testandroid.data.model.ResourceStatus
@@ -37,6 +38,20 @@ class TopRatedMovieFragment : Fragment(), TopRatedMovieItemAdapter.OnMovieClickL
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentTopRatedMovieBinding.inflate(inflater, container, false)
+        binding.tpMovies.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val visibleIteamCount: Int = (binding.tpMovies.layoutManager as LinearLayoutManager).childCount
+                val pastVisibleIteam: Int = (binding.tpMovies.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                val total = binding.tpMovies.adapter!!.itemCount
+                if ((visibleIteamCount + pastVisibleIteam) >= total){
+                    Log.i("progresiosds","${visibleIteamCount}, ${pastVisibleIteam}, as ${total}")
+                    Pages.topRatedPage+=1
+                    topPagination()
+                    Log.i("progress","${Pages.topRatedPage}")
+                }
+            }
+        })
         return binding.root
     }
 
@@ -46,6 +61,10 @@ class TopRatedMovieFragment : Fragment(), TopRatedMovieItemAdapter.OnMovieClickL
         binding.tpMovies.layoutManager = LinearLayoutManager(context)
 
         Pages.topRatedPage+=1
+        topPagination()
+    }
+
+    private fun topPagination() {
         mViewModel.fetchTopRatedMovies.observe(viewLifecycleOwner, Observer {
             when (it.resourceStatus) {
                 ResourceStatus.LOADING -> {
@@ -63,7 +82,6 @@ class TopRatedMovieFragment : Fragment(), TopRatedMovieItemAdapter.OnMovieClickL
                 }
             }
         })
-
     }
 
     override fun onDestroyView() {

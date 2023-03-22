@@ -5,14 +5,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.testandroid.data.entities.MovieEntity
-import com.example.testandroid.data.model.Movie
 import com.example.testandroid.databinding.ItemMovieBinding
-import com.example.testandroid.utils.DateUtils
 import com.squareup.picasso.Picasso
 
 class PopularMovieItemAdapter (
-    private val moviesList: List<MovieEntity>,
-    private val itemClickListener: OnMovieClickListener
+    private val moviesList: MutableList<MovieEntity>,
+    private val itemClickListener: OnMovieClickListener,
 ) : RecyclerView.Adapter<PopularMovieItemAdapter.PopularViewHolder>()  {
 
     interface OnMovieClickListener {
@@ -25,6 +23,10 @@ class PopularMovieItemAdapter (
     }
 
     override fun getItemCount() = moviesList.size
+
+    fun addItems (List: List<MovieEntity>) {
+        moviesList.addAll(List)
+    }
 
     override fun onBindViewHolder(holder: PopularViewHolder, position: Int) {
         with(holder){
